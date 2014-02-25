@@ -18,6 +18,9 @@ class Test(unittest.TestCase):
         self.assertEqual(pbm.closest_color((0,0,200)), 'blue')
         self.assertEqual(pbm.closest_color((120,0,250)), 'violet')
 
+    def test_spiral(self):
+        pass
+
 if __name__ == '__main__':
     unittest.main()
 
