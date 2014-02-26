@@ -3,6 +3,7 @@ from PIL import Image
 from midiutil.MidiFile import MIDIFile
 from math import sqrt
 import itertools
+import numpy as np
 
 colors = {"red": (255 ,0 , 0),
           "orange": (255, 165, 0),
@@ -35,9 +36,10 @@ def euclidean_distance(p, q):
 def color2note(color):
    return notes.get(color)
 
-def spiral(N, M):
+def spiral(X, Y):
     """
     Generate the coordinates of pixels along spiraling out from the center.
+    This generates coordinates such that (0,0) is the top left corner.
 
     Usage:
     for a,b in spiral(5,3):
@@ -45,19 +47,34 @@ def spiral(N, M):
 
     http://stackoverflow.com/questions/398299/looping-in-a-spiral
     """
-    x, y = 0, 0
-    dx, dy = 0, -1
-
-    for n in xrange(N*M):
-        if abs(x) == abs(y) and [dx,dy] != [1,0] or x>0 and y==1-x:
-            dx, dy = -dy, dx    # corner, change direction
-
-        if abs(x)>N/2 or abs(y)>M/2:    #non-square
-            dx, dy = -dy, dx    #change directon
-            x, y = -y+dx, x+dy  #jump
-
-        yield x+N/2, y+M/2
+    x = y = 0
+    dx = 0
+    dy = -1
+    for i in range(max(X, Y)**2):
+        if (-X/2 < x <= X/2) and (-Y/2 < y <= Y/2):
+            yield x+X/2, y+Y/2
+        if x == y or (x < 0 and x == -y) or (x > 0 and x == 1-y):
+            dx, dy = -dy, dx
         x, y = x+dx, y+dy
+
+def rgb2yuv(rgb):
+    """
+    Convert from the rgb colorspace to yuv. The function takes a rgb triple,
+    returns a yuv triple.
+
+    The euclidean distance between two points in yuv colorspace cooresponds
+    to their perceived difference much better than rgb distance does.
+
+    http://en.wikipedia.org/wiki/YUV
+    """
+    rgb_vector = np.array(rgb)
+    transformation_matrix = np.array([[0.299, 0.587, 0.114],
+                                      [-0.14713, -0.28886, 0.436],
+                                      [0.615, -0.51499, -0.10001]])
+
+    yuv_vector = np.dot(transformation_matrix, rgb_vector)
+
+    return tuple(yuv_vector)
 
 if __name__ == "__main__":
     im = Image.open(sys.argv[1])
