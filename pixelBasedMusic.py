@@ -57,24 +57,27 @@ def spiral(X, Y):
             dx, dy = -dy, dx
         x, y = x+dx, y+dy
 
-def rgb2yuv(rgb):
+def rgb2YCbCr(rgb):
     """
-    Convert from the rgb colorspace to yuv. The function takes a rgb triple,
-    returns a yuv triple.
+    Convert from the rgb colorspace to YCbCr. The function takes a rgb triple,
+    returns a YCbCr triple. The range of values for both RGB and 2YCbCr is
+    0 to 255.
 
-    The euclidean distance between two points in yuv colorspace cooresponds
+    The euclidean distance between two points in YCbCr colorspace corresponds
     to their perceived difference much better than rgb distance does.
 
     http://en.wikipedia.org/wiki/YUV
+    http://www.equasys.de/colorconversion.html
     """
     rgb_vector = np.array(rgb)
-    transformation_matrix = np.array([[0.299, 0.587, 0.114],
-                                      [-0.14713, -0.28886, 0.436],
-                                      [0.615, -0.51499, -0.10001]])
+    scaling_vector = np.array([0.0, 128.0, 128.0])
+    transformation_matrix = np.array([[0.299,  0.587,  0.114],
+                                      [-0.169, -0.331, 0.500],
+                                      [0.500,  -0.419, -0.081]])
 
-    yuv_vector = np.dot(transformation_matrix, rgb_vector)
+    YCbCr_vector = scaling_vector + np.dot(transformation_matrix, rgb_vector)
 
-    return tuple(yuv_vector)
+    return tuple(YCbCr_vector)
 
 if __name__ == "__main__":
     im = Image.open(sys.argv[1])
