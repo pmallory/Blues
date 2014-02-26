@@ -1,5 +1,7 @@
 import unittest
 import pixelBasedMusic as pbm
+import numpy
+from numpy.testing import assert_allclose
 from math import sqrt
 
 class Test(unittest.TestCase):
@@ -21,6 +23,17 @@ class Test(unittest.TestCase):
     def test_spiral(self):
         self.assertSequenceEqual(list(pbm.spiral(3,3)), [(1, 1), (2, 1), (2, 2), (1, 2), (0, 2), (0, 1), (0, 0), (1, 0), (2, 0)])
         self.assertSequenceEqual(list(pbm.spiral(3, 5)), [(1, 2), (2, 2), (2, 3), (1, 3), (0, 3), (0, 2), (0, 1), (1, 1), (2, 1), (2, 4), (1, 4), (0, 4), (0, 0), (1, 0), (2, 0)])
+
+    def test_rgb2yuv(self):
+        # assert_allclose checks if all elements of a two sequences are close
+        # necessary b/c floating point
+        assert_allclose(pbm.rgb2YCbCr((255,0,0)),
+                       (76.24499999999999, 84.905000000000001, 255.5))
+        assert_allclose(pbm.rgb2YCbCr((255,255,255)),
+                       (255.0, 128.0, 128.0))
+        assert_allclose(pbm.rgb2YCbCr((50,205,120)),
+                       (148.965, 111.69499999999999, 57.385000000000005))
+
 
 if __name__ == '__main__':
     unittest.main()
