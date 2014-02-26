@@ -5,13 +5,36 @@ from math import sqrt
 import itertools
 import numpy as np
 
-colors = {"red": (255 ,0 , 0),
-          "orange": (255, 165, 0),
-          "yellow": (255 ,255 , 0),
-          "green": (0, 255, 0),
-          "aqua": (127, 255, 212),
-          "blue": (0, 0, 255),
-          "violet": (143, 0, 255),
+def rgb2YCbCr(rgb):
+    """
+    Convert from the rgb colorspace to YCbCr. The function takes a rgb triple,
+    returns a YCbCr triple. The range of values for both RGB and 2YCbCr is
+    0 to 255.
+
+    The euclidean distance between two points in YCbCr colorspace corresponds
+    to their perceived difference much better than rgb distance does.
+
+    http://en.wikipedia.org/wiki/YUV
+    http://www.equasys.de/colorconversion.html
+    """
+    rgb_vector = np.array(rgb)
+    scaling_vector = np.array([0.0, 128.0, 128.0])
+    transformation_matrix = np.array([[0.299,  0.587,  0.114],
+                                      [-0.169, -0.331, 0.500],
+                                      [0.500,  -0.419, -0.081]])
+
+    YCbCr_vector = scaling_vector + np.dot(transformation_matrix, rgb_vector)
+
+    return tuple(YCbCr_vector)
+
+# Map color names to their YCbCr values
+colors = {"red": rgb2YCbCr((255 ,0 , 0)),
+          "orange": rgb2YCbCr((255, 165, 0)),
+          "yellow": rgb2YCbCr((255 ,255 , 0)),
+          "green": rgb2YCbCr((0, 255, 0)),
+          "aqua": rgb2YCbCr((127, 255, 212)),
+          "blue": rgb2YCbCr((0, 0, 255)),
+          "violet": rgb2YCbCr((143, 0, 255)),
          }
 
 notes = {"red": 60,     #middle C
@@ -26,7 +49,7 @@ notes = {"red": 60,     #middle C
 def closest_color(rgb):
     distances = []
     for color in colors:
-        distances.append((euclidean_distance(rgb, colors[color]), color))
+        distances.append((euclidean_distance(rgb2YCbCr(rgb), colors[color]), color))
 
     return min(distances)[1]
 
