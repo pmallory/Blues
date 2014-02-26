@@ -24,7 +24,7 @@ class Test(unittest.TestCase):
         self.assertSequenceEqual(list(pbm.spiral(3,3)), [(1, 1), (2, 1), (2, 2), (1, 2), (0, 2), (0, 1), (0, 0), (1, 0), (2, 0)])
         self.assertSequenceEqual(list(pbm.spiral(3, 5)), [(1, 2), (2, 2), (2, 3), (1, 3), (0, 3), (0, 2), (0, 1), (1, 1), (2, 1), (2, 4), (1, 4), (0, 4), (0, 0), (1, 0), (2, 0)])
 
-    def test_rgb2yuv(self):
+    def test_rgb2YCbCr(self):
         # assert_allclose checks if all elements of a two sequences are close
         # necessary b/c floating point
         assert_allclose(pbm.rgb2YCbCr((255,0,0)),
