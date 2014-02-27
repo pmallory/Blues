@@ -4,6 +4,8 @@ from midiutil.MidiFile import MIDIFile
 from math import sqrt
 import itertools
 import numpy as np
+from collections import deque
+from scipy.cluster.vq import kmeans
 
 def rgb2YCbCr(rgb):
     """
@@ -95,13 +97,54 @@ def rgb2YCbCr(rgb):
     """
     rgb_vector = np.array(rgb)
     scaling_vector = np.array([0.0, 128.0, 128.0])
-    transformation_matrix = np.array([[0.299,  0.587,  0.114],
-                                      [-0.169, -0.331, 0.500],
-                                      [0.500,  -0.419, -0.081]])
+    transformation_matrix = np.array([[ 0.299,  0.587,  0.114],
+                                      [-0.169, -0.331,  0.500],
+                                      [ 0.500, -0.419, -0.081]])
 
     YCbCr_vector = scaling_vector + np.dot(transformation_matrix, rgb_vector)
 
     return tuple(YCbCr_vector)
+
+def YCbCr2rgb(YCbCr):
+    """
+    Convert from a YCbCr triple to an RGB triple (of ints).
+
+    NOTE: Converting back and forth isn't perfectly precise. The error is less
+          than one though and since RGB triples are integers it's okay!
+    """
+    YCbCr_vector = np.array(YCbCr) + np.array([0, -128, -128])
+    transformation_matrix = np.array([[1.0,  0.000,  1.400],
+                                      [1.0, -0.343, -0.711],
+                                      [1.0,  1.765,  0.000]])
+
+    rgb_vector = np.dot(transformation_matrix, YCbCr_vector)
+
+    return rgb_vector.astype(int)
+
+def dominantColors(image, k):
+    """
+    Return the k dominant colors of an image
+
+    image of of type PIL.Image
+    """
+
+    # shrink image so this doesn't take all day
+    small_image = image.resize((100,100))
+
+    # make a numpy array with an RGB triple for each of
+    # the 10000 pixels in small_image.
+    rgb_matrix = np.array(small_image).reshape(1e4, 3)
+
+    # convert values to YCbCr
+    YCbCr_matrix = np.apply_along_axis(rgb2YCbCr, 1, rgb_matrix)
+
+    # get the dominant colors with k-means clustering
+    YCbCr_dominant_colors = kmeans(YCbCr_matrix, 3)[0]
+
+    #convert back to RGB
+    RGB_dominant_colors = np.apply_along_axis(YCbCr2rgb, 1, YCbCr_dominant_colors)
+
+    return RGB_dominant_colors
 
 
 def isMonotonous(note, previous_notes):

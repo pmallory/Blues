@@ -3,6 +3,7 @@ import pixelBasedMusic as pbm
 import numpy
 from numpy.testing import assert_allclose
 from math import sqrt
+from random import randint
 
 class Test(unittest.TestCase):
 
@@ -33,6 +34,35 @@ class Test(unittest.TestCase):
                        (255.0, 128.0, 128.0))
         assert_allclose(pbm.rgb2YCbCr((50,205,120)),
                        (148.965, 111.69499999999999, 57.385000000000005))
+
+    def test_YCbCr2rgb(self):
+        # Make sure we're within 1% when converting back and forth, or have an
+        # absolute error of less than 1. Since RGB triples are integers an
+        # error less than one is okay.
+
+        # test extremes:
+        test_color = (0,0,0)
+        assert_allclose(test_color,
+                        pbm.YCbCr2rgb(pbm.rgb2YCbCr(test_color)),
+                        rtol=1e-2)
+
+        test_color = (255,255,255)
+        assert_allclose(test_color,
+                        pbm.YCbCr2rgb(pbm.rgb2YCbCr(test_color)),
+                        rtol=1e-2)
+
+        test_color = (127, 127, 127)
+        assert_allclose(test_color,
+                        pbm.YCbCr2rgb(pbm.rgb2YCbCr(test_color)),
+                        rtol=1e-2)
+
+        # do some random tests:
+        for i in xrange(100):
+            test_color = (randint(0, 255), randint(0, 255), randint(0, 255))
+            assert_allclose(test_color,
+                            pbm.YCbCr2rgb(pbm.rgb2YCbCr(test_color)),
+                            rtol=1e-2,
+                            atol=1)
 
 
 if __name__ == '__main__':
