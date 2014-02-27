@@ -37,6 +37,7 @@ colors = {"red": rgb2YCbCr((255 ,0 , 0)),
           "violet": rgb2YCbCr((143, 0, 255)),
          }
 
+# Map color names to notes
 notes = {"red": 60,     #middle C
          "orange": 62,  #D
          "yellow": 64,  #E
@@ -102,6 +103,11 @@ def rgb2YCbCr(rgb):
 
     return tuple(YCbCr_vector)
 
+
+def isMonotonous(note, previous_notes):
+    return note is previous_notes[0] is previous_notes[1] \
+                is previous_notes[2] is previous_notes[3]
+
 if __name__ == "__main__":
     im = Image.open(sys.argv[1])
     pixels = im.load()
@@ -113,13 +119,19 @@ if __name__ == "__main__":
 
     time = 0
 
+    # Keep track of recent notes so we don't play the same one
+    # five times in a row.
+    recent_notes = deque([None]*4, 4)
+
     for x, y in itertools.islice(spiral(*dimensions), 100):
-        print("RGB: {} Nearest match: {}".format(pixels[x,y], closest_color(pixels[x,y])))
-        midiFile.addNote(0, 0, color2note(closest_color(pixels[x,y])), time, 1, 100)
-        time += 1
+        note = color2note(closest_color(pixels[x,y]))
+
+        recent_notes.append(note)
+
+        if (not isMonotonous(note, recent_notes)):
+            midiFile.addNote(0, 0, note, time, 1, 100)
+            time += 1
 
     with open('song.mid', 'wb') as file:
         midiFile.writeFile(file)
-
-
 
