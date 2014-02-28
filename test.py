@@ -64,6 +64,9 @@ class Test(unittest.TestCase):
                             rtol=1e-2,
                             atol=1)
 
+    def test_is_monotonous(self):
+        self.assertTrue(pbm.is_monotonous(1,[1,1,1,1]))
+
 
 if __name__ == '__main__':
     unittest.main()
