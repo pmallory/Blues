@@ -1,6 +1,8 @@
 from mingus.core import *
 from mingus.containers import *
 from mingus.midi import MidiFileOut
+import mingus.core.scales as scales
+from mingus.containers.Note import Note
 
 key = 'G'
 progression = ['I', 'I', 'I', 'I', 'IV', 'IV', 'I', 'I', 'V', 'V', 'I', 'I']
@@ -33,6 +35,50 @@ def make_rhythm(key, chord):
     bar.place_notes(major_sixth_simple, 4)
 
     return down_octave(bar)
+
+def make_melody(key, seed):
+    """Make a bar of melody in key based on key, a sequence of colors."""
+    bar = Bar()
+    bar.set_meter((14,4))
+    scale = blues_scale(key)
+
+    for note in scale:
+        bar.place_notes(note, 4)
+
+    for note in reversed(scale):
+        print(note)
+        bar.place_notes(note, 4)
+
+    MidiFileOut.write_Bar('scale.mid', bar)
+
+def blues_scale(key):
+    """Return a blues scale in a given key"""
+    major_scale = list(scales.ionian(key))
+
+    #Use mingus.containers.Note to represent notes so we have octave info
+    for i, note in enumerate(major_scale):
+        major_scale[i] = Note(note)
+        if i>0 and major_scale[i]<major_scale[i-1]:
+            major_scale[i].octave_up()
+
+    # mingus.Scales is dumb, this is a workaround =/
+    fifth = Note(major_scale[4])
+    major_scale[2].diminish()
+    major_scale[4].diminish()
+    major_scale[6].diminish()
+    seventh = Note(major_scale[0])
+    seventh.octave_up()
+
+    #assemble the blues scale
+    blues_scale = [major_scale[0],
+                   major_scale[2],
+                   major_scale[3],
+                   major_scale[4],
+                   fifth,
+                   major_scale[6],
+                   seventh]
+
+    return blues_scale
 
 def down_octave(bar):
     for chord in [beat[2] for beat in bar]:
