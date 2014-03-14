@@ -25,7 +25,6 @@ def closest_color(rgb):
         distances.append((euclidean_distance(reference_color,
                           colors[color]), color))
 
-
     return min(distances)[1]
 
 def euclidean_distance(p, q):
@@ -43,6 +42,23 @@ def color2note(color):
             }
 
     return notes.get(color)
+
+def color2key(color):
+    keys = {"red": 'C',
+            "orange": 'D',
+            "yellow": 'E',
+            "green": 'F',
+            "aqua": 'G',
+            "blue": 'A',
+            "violet":'B',
+           }
+
+    key = keys.get(color)
+
+    if not key:
+        raise Exception
+
+    return keys.get(color)
 
 def spiral(X, Y):
     """
