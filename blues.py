@@ -3,11 +3,23 @@ from mingus.containers import *
 from mingus.midi import MidiFileOut
 import mingus.core.scales as scales
 from mingus.containers.Note import Note
+from mingus.containers.Composition import Composition
+from random import randint
 
-key = 'G'
-progression = ['I', 'I', 'I', 'I', 'IV', 'IV', 'I', 'I', 'V', 'V', 'I', 'I']
+key = 'C'
 
-def make_rhythm(key, chord):
+def standard_progression():
+    return ['I', 'I', 'I', 'I', 'IV', 'IV', 'I', 'I', 'V', 'V', 'I', 'I']
+
+def shuffle_progression():
+    return ['I', 'I', 'I', 'I', 'IV', 'IV', 'I', 'I', 'V', 'IV', 'I', 'I']
+
+def quick_to_four_progression():
+    return ['I', 'IV', 'I', 'I', 'IV', 'IV', 'I', 'I', 'V', 'IV', 'I', 'I']
+
+#TODO turnarounds on the last bar (dominant chord or  augmented dominant)
+
+def make_rhythm_bar(key, chord):
     bar = Bar()
 
     if chord is 'I':
@@ -36,20 +48,32 @@ def make_rhythm(key, chord):
 
     return down_octave(bar)
 
-def make_melody(key, seed):
+def rhythm_track(key, progression_type='standard', repititions=1):
+    track = Track()
+
+    if progression_type is 'standard':
+        progression = standard_progression()
+    elif progression_type is 'shuffle':
+        progression = shuffle_progression()
+    elif progression_type is 'quick to four':
+        progression = quick_to_four_progression()
+    else:
+        raise ValueError('invalid progression type')
+
+    for chord in progression*repititions:
+       track.add_bar(make_rhythm_bar(key, chord))
+
+    return track
+
+def make_melody_bar(key, seed):
     """Make a bar of melody in key based on key, a sequence of colors."""
     bar = Bar()
-    bar.set_meter((14,4))
     scale = blues_scale(key)
 
-    for note in scale:
+    for note in scale[randint(0,2):]:
         bar.place_notes(note, 4)
 
-    for note in reversed(scale):
-        print(note)
-        bar.place_notes(note, 4)
-
-    MidiFileOut.write_Bar('scale.mid', bar)
+    return bar
 
 def blues_scale(key):
     """Return a blues scale in a given key"""
@@ -89,10 +113,15 @@ def down_octave(bar):
 
 if __name__ == '__main__':
     rhythm_track = Track()
+    melody_track = Track()
 
     for chord in progression:
-        rhythm_track.add_bar(make_rhythm(key, chord))
+        rhythm_track.add_bar(make_rhythm_bar(key, chord))
+        melody_track.add_bar(make_melody_bar(key, 'poop'))
 
-    MidiFileOut.write_Track('blues.mid', rhythm_track)
+    composition = Composition()
+    composition.add_track(melody_track)
+    composition.add_track(rhythm_track)
 
+    MidiFileOut.write_Composition('blues.mid', composition)
 
