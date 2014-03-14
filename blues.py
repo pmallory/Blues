@@ -4,7 +4,7 @@ from mingus.midi import MidiFileOut
 import mingus.core.scales as scales
 from mingus.containers.Note import Note
 from mingus.containers.Composition import Composition
-from random import randint
+import random
 
 key = 'C'
 
@@ -70,8 +70,22 @@ def make_melody_bar(key, seed):
     bar = Bar()
     scale = blues_scale(key)
 
-    for note in scale[randint(0,2):]:
-        bar.place_notes(note, 4)
+    note = random.choice(scale)
+    bar.place_notes(note, 4)
+
+    while bar.space_left():
+        next_item = random.choice(['quarter note', 'eighth note',
+                                   'quarter rest', 'eighth rest'])
+
+        if next_item is 'quarter rest':
+            pass
+            #bar.place_rest(4)
+        elif next_item is 'eighth rest':
+            bar.place_rest(8)
+        elif next_item is 'quarter note':
+            bar.place_notes(key, 4)
+        elif next_item is 'eigth note':
+            bar.place_notes(key, 8)
 
     return bar
 

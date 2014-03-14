@@ -4,8 +4,16 @@ from midiutil.MidiFile import MIDIFile
 from math import sqrt
 import itertools
 import numpy as np
+from mingus.containers.Composition import Composition
+from mingus.containers import *
+from mingus.midi import MidiFileOut
 from collections import deque
 from scipy.cluster.vq import kmeans
+from random import randint
+import blues
+
+SCAN_LIMIT = 20
+#SCAN_LIMIT = 10**4
 
 def closest_color(rgb):
 # Map color names to their YCbCr values
@@ -149,30 +157,53 @@ def is_monotonous(note, previous_notes):
     """ return True if each of the previous notes is the same as note. """
     return all(note == n for n in previous_notes)
 
+def vary(iterable, repeat_limit=3):
+    """ Yield successive items from iterable, where the same item
+        appears no more than repeat_limit times in a row
+    """
+    previous_items = deque([], repeat_limit)
+    for i in xrange(repeat_limit):
+        item = iterable.next()
+        previous_items.append(item)
+        yield item
+
+    next_item = iterable.next()
+    while next_item:
+        if not is_monotonous(next_item, previous_items):
+            previous_items.append(next_item)
+            yield next_item
+        next_item = iterable.next()
+
+def color_sequence(pixels, dimensions):
+    """
+    yield colors from an image by spiraling from its center
+    """
+    for r,c in spiral(*dimensions):
+        yield closest_color(pixels[r,c])
+
+
 if __name__ == "__main__":
     im = Image.open(sys.argv[1])
     pixels = im.load()
     dimensions = im.size
 
-    midiFile = MIDIFile(1)
-    midiFile.addTrackName(0, 0, "Piano")
-    midiFile.addTempo(0, 0, 120)
+    palette  = dominant_colors(im, k=3)
 
-    time = 0
+    key = color2key(closest_color(palette[0]))
 
-    # Keep track of recent notes so we don't play the same one
-    # five times in a row.
-    recent_notes = deque([None]*4, 4)
+    rhythm_track = blues.rhythm_track(key)
+    melody_track = Track()
 
-    for r, c in itertools.islice(spiral(*dimensions), 100):
-        note = color2note(closest_color(pixels[r, c]))
+    interesting_color_sequence = vary(color_sequence(pixels, dimensions))
 
-        recent_notes.append(note)
+    for bar_number in xrange(12):
+        melody_track.add_bar(blues.make_melody_bar(key,
+            itertools.islice(interesting_color_sequence, 20)))
 
-        if not is_monotonous(note, recent_notes):
-            midiFile.addNote(0, 0, note, time, 1, 100)
-            time += 1
 
-    with open('song.mid', 'wb') as f:
-        midiFile.writeFile(f)
+    composition = Composition()
+    composition.add_track(melody_track)
+    composition.add_track(rhythm_track)
+
+    MidiFileOut.write_Composition('pixelBasedMusic.mid', composition)
 
