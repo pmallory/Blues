@@ -129,6 +129,8 @@ if __name__ == '__main__':
     rhythm_track = Track()
     melody_track = Track()
 
+    progression = standard_progression()
+
     for chord in progression:
         rhythm_track.add_bar(make_rhythm_bar(key, chord))
         melody_track.add_bar(make_melody_bar(key, 'poop'))
