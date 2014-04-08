@@ -167,7 +167,7 @@ def vary(iterable, repeat_limit=3):
         previous_items.append(item)
         yield item
 
-    next_item = iterable.next()
+    next_item = iterable.next() #TODO add a default of None to this
     while next_item:
         if not is_monotonous(next_item, previous_items):
             previous_items.append(next_item)
@@ -191,12 +191,12 @@ if __name__ == "__main__":
 
     key = color2key(closest_color(palette[0]))
 
-    rhythm_track = blues.rhythm_track(key)
+    rhythm_track = blues.rhythm_track(key, repititions=2)
     melody_track = Track()
 
     interesting_color_sequence = vary(color_sequence(pixels, dimensions))
 
-    for bar_number in xrange(12):
+    for bar_number in xrange(24):
         melody_track.add_bar(blues.make_melody_bar(key,
             itertools.islice(interesting_color_sequence, 20)))
 

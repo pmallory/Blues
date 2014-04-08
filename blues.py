@@ -84,7 +84,7 @@ def make_melody_bar(key, seed):
             bar.place_rest(8)
         elif next_item is 'quarter note':
             bar.place_notes(key, 4)
-        elif next_item is 'eigth note':
+        elif next_item is 'eighth note':
             bar.place_notes(key, 8)
 
     return bar
