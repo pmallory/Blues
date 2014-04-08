@@ -1,6 +1,5 @@
 import sys
 from PIL import Image
-from midiutil.MidiFile import MIDIFile
 from math import sqrt
 import itertools
 import numpy as np
