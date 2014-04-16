@@ -13,7 +13,9 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         length = int(self.headers.getheader('content-length'))
         data = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
 
-        with open('image.jpg', 'w') as img_file:
+        print("DATA" + data)
+
+        with open('image.jpg', 'wb') as img_file:
             img_file.write(data)
 
         with open('test.mp3', 'rb') as song_file:
