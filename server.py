@@ -1,5 +1,6 @@
 import BaseHTTPServer
 from cStringIO import StringIO
+import cgi
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET(self):
