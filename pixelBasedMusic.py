@@ -180,9 +180,8 @@ def color_sequence(pixels, dimensions):
     for r,c in spiral(*dimensions):
         yield closest_color(pixels[r,c])
 
-
-if __name__ == "__main__":
-    im = Image.open(sys.argv[1])
+def image2midi(image):
+    im = Image.open(image)
     pixels = im.load()
     dimensions = im.size
 
@@ -204,5 +203,10 @@ if __name__ == "__main__":
     composition.add_track(melody_track)
     composition.add_track(rhythm_track)
 
-    MidiFileOut.write_Composition('pixelBasedMusic.mid', composition)
+    return composition
+
+if __name__ == "__main__":
+    midi_composition = image2midi(sys.argv[1])
+
+    MidiFileOut.write_Composition('pixelBasedMusic.mid', midi_composition)
 
