@@ -22,7 +22,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         MidiFileOut.write_Composition('tmp.mid', midi_composition)
 
         subprocess.call("timidity -Ow ./tmp.mid", shell=True)
-        subprocess.call("lame tmp.wav tmp.mp3"i, shell=True)
+        subprocess.call("lame tmp.wav tmp.mp3", shell=True)
 
         with open('tmp.mp3', 'rb') as song_file:
             self.send_response(200)
