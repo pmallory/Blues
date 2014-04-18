@@ -23,7 +23,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         composition = pixelBasedMusic.image2midi('./tmp.jpg')
         MidiFileOut.write_Composition('tmp.mid', composition)
 
-        subprocess.call("timidity -Ow ./tmp.mid", shell=True)
+        subprocess.call("timidity -Ow tmp.mid", shell=True)
         subprocess.call("lame tmp.wav tmp.mp3", shell=True)
 
         with open('tmp.mp3', 'rb') as song_file:
@@ -32,7 +32,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(song_file.read())
 
-        #subprocess.call("rm tmp.jpg tmp.mid tmp.mp3", shell=True)
+        subprocess.call("rm tmp.wav tmp.jpg tmp.mid tmp.mp3", shell=True)
 
 PORT = 80
 
