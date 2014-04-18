@@ -2,6 +2,8 @@ import BaseHTTPServer
 from cStringIO import StringIO
 import urlparse
 import pixelBasedMusic
+from mingus.midi import MidiFileOut
+import subprocess
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -19,7 +21,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
             image_file.write(post_data)
 
         composition = pixelBasedMusic.image2midi('./tmp.jpg')
-        MidiFileOut.write_Composition('tmp.mid', midi_composition)
+        MidiFileOut.write_Composition('tmp.mid', composition)
 
         subprocess.call("timidity -Ow ./tmp.mid", shell=True)
         subprocess.call("lame tmp.wav tmp.mp3", shell=True)
@@ -30,7 +32,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(song_file.read())
 
-        subprocess.call("rm tmp.jpg tmp.mid tmp.mp3", shell=True)
+        #subprocess.call("rm tmp.jpg tmp.mid tmp.mp3", shell=True)
 
 PORT = 80
 
