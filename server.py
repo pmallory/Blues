@@ -1,6 +1,7 @@
 import BaseHTTPServer
 from cStringIO import StringIO
-import cgi
+import urlparse
+import pixelBasedMusic
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -10,20 +11,26 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.wfile.write("The server is up. Use a post request with any data to get an mp3 back.")
 
     def do_POST(self):
-        length = int(self.headers.getheader('content-length'))
-        data = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+        # Extract the contents of the POST
+        length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(length)
 
-        print("DATA" + data)
+        with open('tmp.jpg' ,'wb') as image_file:
+            image_file.write(post_data)
 
-        with open('image.jpg', 'wb') as img_file:
-            img_file.write(data)
+        composition = pixelBasedMusic.image2midi('./tmp.jpg')
+        MidiFileOut.write_Composition('tmp.mid', midi_composition)
 
-        with open('test.mp3', 'rb') as song_file:
+        subprocess.call("timidity -Ow ./tmp.mid", shell=True)
+        subprocess.call("lame tmp.wav tmp.mp3"i, shell=True)
+
+        with open('tmp.mp3', 'rb') as song_file:
             self.send_response(200)
             self.send_header("Content-type", "audio/mpeg")
             self.end_headers()
             self.wfile.write(song_file.read())
 
+        subprocess.call("rm tmp.jpg tmp.mid tmp.mp3", shell=True)
 
 PORT = 80
 
