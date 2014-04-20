@@ -20,7 +20,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         with open('tmp.jpg' ,'wb') as image_file:
             image_file.write(post_data)
 
-        composition = pixelBasedMusic.image2midi('./tmp.jpg')
+        composition = pixelBasedMusic.image2midi('tmp.jpg')
         MidiFileOut.write_Composition('tmp.mid', composition)
 
         subprocess.call("timidity -Ow tmp.mid", shell=True)
