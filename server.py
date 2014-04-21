@@ -7,6 +7,7 @@ import subprocess
 import datetime
 import cgi
 import os
+import random
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
@@ -35,13 +36,11 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         if os.path.getsize("accumulator.jpg") < (length*4*0.9):
             return
 
-        '''
-        with open('tmp.jpg' ,'wb') as image_file:
-            image_file.write(post_data)
-        '''
-
         composition = pixelBasedMusic.image2midi('accumulator.jpg')
-        MidiFileOut.write_Composition('tmp.mid', composition)
+        tempo = random.randrange(60, 140 , 5)
+        MidiFileOut.write_Composition('tmp.mid', composition, tempo)
+
+        print('bpm: {}'.format(tempo))
 
         subprocess.call("timidity -Ow tmp.mid", shell=True)
         subprocess.call("lame tmp.wav tmp.mp3", shell=True)
