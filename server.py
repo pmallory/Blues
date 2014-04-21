@@ -4,35 +4,49 @@ import urlparse
 import pixelBasedMusic
 from mingus.midi import MidiFileOut
 import subprocess
+import datetime
+import cgi
+import os
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
+
     def do_GET(self):
         self.send_response(200)
-        self.send_header("Content-type", "text/html")
+        self.send_header("Content-type", "audio/mpeg")
         self.end_headers()
-        self.wfile.write("The server is up. Use a post request with any data to get an mp3 back.")
-
-    def do_POST(self):
-        # Extract the contents of the POST
-        length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(length)
-
-        with open('tmp.jpg' ,'wb') as image_file:
-            image_file.write(post_data)
-
-        composition = pixelBasedMusic.image2midi('tmp.jpg')
-        MidiFileOut.write_Composition('tmp.mid', composition)
-
-        subprocess.call("timidity -Ow tmp.mid", shell=True)
-        subprocess.call("lame tmp.wav tmp.mp3", shell=True)
-
         with open('tmp.mp3', 'rb') as song_file:
             self.send_response(200)
             self.send_header("Content-type", "audio/mpeg")
             self.end_headers()
             self.wfile.write(song_file.read())
 
-        subprocess.call("rm tmp.wav tmp.jpg tmp.mid tmp.mp3", shell=True)
+    def do_POST(self):
+        print self.headers
+        length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(length)
+
+        if (os.path.isfile('accumulator.jpg')):
+            with open('accumulator.jpg', 'ab') as partial_file:
+                partial_file.write(post_data[500:])
+        else:
+            with open('accumulator.jpg', 'wb') as partial_file:
+                partial_file.write(post_data[:141])
+
+        if os.path.getsize("accumulator.jpg") < (length*4*0.9):
+            return
+
+        '''
+        with open('tmp.jpg' ,'wb') as image_file:
+            image_file.write(post_data)
+        '''
+
+        composition = pixelBasedMusic.image2midi('accumulator.jpg')
+        MidiFileOut.write_Composition('tmp.mid', composition)
+
+        subprocess.call("timidity -Ow tmp.mid", shell=True)
+        subprocess.call("lame tmp.wav tmp.mp3", shell=True)
+
+        #subprocess.call("rm tmp.wav tmp.jpg tmp.mid", shell=True)
 
 PORT = 80
 

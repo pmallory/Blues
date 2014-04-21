@@ -5,8 +5,8 @@ import mingus.core.scales as scales
 from mingus.containers.Note import Note
 from mingus.containers.Composition import Composition
 import random
+import mingus.core.notes as notes
 
-key = 'C'
 
 def standard_progression():
     return ['I', 'I', 'I', 'I', 'IV', 'IV', 'I', 'I', 'V', 'V', 'I', 'I']
@@ -51,6 +51,9 @@ def make_rhythm_bar(key, chord):
 def rhythm_track(key, progression_type='standard', repititions=1):
     track = Track()
 
+    progression_type = random.choice(['standard','shuffle','quick to four'])
+    print("Progression Type: {}".format(progression_type))
+
     if progression_type is 'standard':
         progression = standard_progression()
     elif progression_type is 'shuffle':
@@ -71,11 +74,18 @@ def make_melody_bar(key, seed):
     scale = blues_scale(key)
 
     note = random.choice(scale)
+    note_number = scale.index(note)
+    #TODO walk the scale!
     bar.place_notes(note, 4)
 
     while bar.space_left():
         next_item = random.choice(['quarter note', 'eighth note',
                                    'quarter rest', 'eighth rest'])
+
+        note_number += random.choice([-1,0,1])
+        if note_number<0 or note_number>len(scale)-1:
+            note = random.choice(scale)
+            note_number = scale.index(note)
 
         if next_item is 'quarter rest':
             pass
@@ -83,9 +93,9 @@ def make_melody_bar(key, seed):
         elif next_item is 'eighth rest':
             bar.place_rest(8)
         elif next_item is 'quarter note':
-            bar.place_notes(key, 4)
+            bar.place_notes(scale[note_number], 4)
         elif next_item is 'eighth note':
-            bar.place_notes(key, 8)
+            bar.place_notes(scale[note_number], 8)
 
     return bar
 
@@ -133,7 +143,7 @@ if __name__ == '__main__':
 
     for chord in progression:
         rhythm_track.add_bar(make_rhythm_bar(key, chord))
-        melody_track.add_bar(make_melody_bar(key, 'poop'))
+        melody_track.add_bar(make_melody_bar(key, None))
 
     composition = Composition()
     composition.add_track(melody_track)
