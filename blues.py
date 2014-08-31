@@ -1,3 +1,5 @@
+#! env/bin/python
+
 from mingus.core import *
 from mingus.containers import *
 from mingus.midi import MidiFileOut
