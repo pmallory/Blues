@@ -68,8 +68,8 @@ def rhythm_track(key, progression_type='standard', repititions=1):
 
     return track
 
-def make_melody_bar(key, seed):
-    """Make a bar of melody in key based on seed, a sequence of colors."""
+def make_melody_bar(key):
+    """Make a bar of melody in the specified key."""
     bar = Bar()
     scale = blues_scale(key)
 
