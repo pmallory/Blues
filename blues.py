@@ -19,7 +19,7 @@ def quick_to_four_progression():
 
 #TODO turnarounds on the last bar (dominant chord or  augmented dominant)
 
-def make_rhythm_bar(key='C', chord):
+def make_rhythm_bar(chord, key='C'):
     bar = Bar()
 
     if chord is 'I':
@@ -64,7 +64,7 @@ def rhythm_track(key, progression_type='standard', repititions=1):
         raise ValueError('invalid progression type')
 
     for chord in progression*repititions:
-       track.add_bar(make_rhythm_bar(key, chord))
+       track.add_bar(make_rhythm_bar(chord, key))
 
     return track
 
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     progression = standard_progression()
 
     for chord in progression:
-        rhythm_track.add_bar(make_rhythm_bar(key, chord))
+        rhythm_track.add_bar(make_rhythm_bar(chord, key))
         melody_track.add_bar(make_melody_bar(key, None))
 
     composition = Composition()
