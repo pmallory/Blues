@@ -19,7 +19,7 @@ def quick_to_four_progression():
 
 #TODO turnarounds on the last bar (dominant chord or  augmented dominant)
 
-def make_rhythm_bar(key, chord):
+def make_rhythm_bar(key='C', chord):
     bar = Bar()
 
     if chord is 'I':
@@ -68,7 +68,7 @@ def rhythm_track(key, progression_type='standard', repititions=1):
 
     return track
 
-def make_melody_bar(key):
+def make_melody_bar(key='C'):
     """Make a bar of melody in the specified key."""
     bar = Bar()
     scale = blues_scale(key)
