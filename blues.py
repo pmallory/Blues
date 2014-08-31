@@ -136,6 +136,8 @@ def down_octave(bar):
     return bar
 
 if __name__ == '__main__':
+    key = 'C'
+
     rhythm_track = Track()
     melody_track = Track()
 
@@ -143,7 +145,7 @@ if __name__ == '__main__':
 
     for chord in progression:
         rhythm_track.add_bar(make_rhythm_bar(chord, key))
-        melody_track.add_bar(make_melody_bar(key, None))
+        melody_track.add_bar(make_melody_bar(key))
 
     composition = Composition()
     composition.add_track(melody_track)
