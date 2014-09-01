@@ -20,3 +20,9 @@ composition.add_track(rhythm_track)
 MidiFileOut.write_Composition('Blues.mid', composition)
 ```
 
+Requires FluidSynth,
+```bash
+apt-get install FluidSynth
+or
+brew install FluidSynth
+``
