@@ -1,4 +1,5 @@
 from flask import Flask, Response
+from werkzeug.contrib.fixers import ProxyFix
 app = Flask(__name__, static_url_path='')
 
 import blues
@@ -29,8 +30,10 @@ def main():
     m.tracks = t
     for i in range(len(composition.tracks)):
         m.tracks[i].play_Track(composition.tracks[i])
+
     return Response(m.get_midi_data(), mimetype='audio/midi')
 
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 if __name__ == "__main__":
     app.run(debug=False)
